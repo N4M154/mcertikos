@@ -111,11 +111,25 @@ void set_ptbl_entry_identity(unsigned int pde_index, unsigned int pte_index, uns
 }
 
 // sets the specified page table entry to 0
-void rmv_ptbl_entry(unsigned int proc_index, unsigned int pde_index, unsigned int pte_index)
+void rmv_ptbl_entry(unsigned int proc_index, unsigned int pde_index, unsigned int pte_index)//removes a specific page table entry for a given process. 
 {
     // TODO
-    unsigned int * pte;
+    unsigned int * pte;//Declares a pointer pte that will later point to the memory address of the page table entry we want to remove.
+     /*The entry in PDirPool[proc_index]
+    [pde_index] contains the base address of the page table (along with permission bits). 
+    This value is cast to unsigned int and stored in pte_addr.*/
     unsigned int pte_addr = (unsigned int)PDirPool[proc_index][pde_index];
+
+/*The hex code 0xfffff000 is a 32-bit hexadecimal value used to mask out the lower 12 bits of a 32-bit address. Here's what it means:
+0xfffff000 in binary is:
+1111 1111 1111 1111 1111 1111 0000 0000
+This mask is used to clear the lower 12 bits of a 32-bit value, 
+which is commonly done when working with page tables, where memory addresses are aligned to 4 KB (4096 bytes). 
+In a 4 KB page, the lower 12 bits of the address (bits 0-11) are used for page offsets and flags (like permissions), 
+while the upper 20 bits (bits 12-31) hold the base address.
+Purpose:
+The operation pte_addr &= 0xfffff000 clears the lower 12 bits, leaving only the base address of the page table, 
+which is 4 KB-aligned. This is done to remove permission or flag bits so that the actual memory address can be accessed.*/
     pte_addr &= 0xfffff000;//remove perm bits
     pte_addr += pte_index << 2;
     pte = (unsigned int *)pte_addr;
